@@ -75,25 +75,42 @@
 // const f = Seongwoo.calcAge;
 // f();
 
-const seongwoo = {
-  fullName: 'seongwkim',
-  year: 1978,
-  calcAge: function () {
-    console.log(this);
-    console.log(2023 - this.year);
-  },
-  greet: function () {
-    const logThis = () => console.log(this);
-    logThis();
-  },
+// const seongwoo = {
+//   fullName: 'seongwkim',
+//   year: 1978,
+//   calcAge: function () {
+//     console.log(this);
+//     console.log(2023 - this.year);
+//   },
+//   greet: function () {
+//     const logThis = () => console.log(this);
+//     logThis();
+//   },
+// };
+
+// seongwoo.calcAge();
+// seongwoo.greet();
+
+// const arg = function (a) {
+//   console.log(a);
+//   console.log(...arguments);
+// };
+
+// arg(1, 2, 3, 45, 1);
+
+let ain = {
+  height: 154,
+  weight: 34.5,
+  taste: { movie: 'Interstelar', music: 'Billy Elisha' },
 };
+let ainCopy = ain;
 
-seongwoo.calcAge();
-seongwoo.greet();
+ain.height = 157;
+console.log('ain', ain);
+console.log('ainCopy', ainCopy);
 
-const arg = function (a) {
-  console.log(a);
-  console.log(...arguments);
-};
-
-arg(1, 2, 3, 45, 1);
+let ainShallow = Object.assign({}, ain);
+ain.height += 3;
+ain.taste.music = null;
+console.log('ain', ain);
+console.log('ainShallow', ainShallow);

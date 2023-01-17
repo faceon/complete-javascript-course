@@ -138,45 +138,158 @@ const flights =
 // }
 // console.log(scorers);
 
-// Coding Challenge #3
-const gameEvents = new Map([
-  [17, '⚽️ GOAL'],
-  [36, '🔁 Substitution'],
-  [47, '⚽️ GOAL'],
-  [61, '🔁 Substitution'],
-  [64, '🔶 Yellow card'],
-  [69, '🔴 Red card'],
-  [70, '🔁 Substitution'],
-  [72, '🔁 Substitution'],
-  [76, '⚽️ GOAL'],
-  [80, '⚽️ GOAL'],
-  [92, '🔶 Yellow card'],
-]);
+// // Coding Challenge #3
+// const gameEvents = new Map([
+//   [17, '⚽️ GOAL'],
+//   [36, '🔁 Substitution'],
+//   [47, '⚽️ GOAL'],
+//   [61, '🔁 Substitution'],
+//   [64, '🔶 Yellow card'],
+//   [69, '🔴 Red card'],
+//   [70, '🔁 Substitution'],
+//   [72, '🔁 Substitution'],
+//   [76, '⚽️ GOAL'],
+//   [80, '⚽️ GOAL'],
+//   [92, '🔶 Yellow card'],
+// ]);
 
+// /*
+// Let's continue with our football betting app!
+// This time, we have a map with a log of the events that happened during the game.
+// The values are the events themselves, and the keys are the minutes in which each event happened
+// (a football game has 90 minutes plus some extra time).
+// */
+
+// //1. Create an array 'events' of the different game events that happened (no duplicates)
+// const events = new Set(gameEvents.values());
+// console.log(events);
+
+// // 2. After the game has finished, is was found that the yellow card from minute 64 was unfair.
+// // So remove this event from the game events log.
+// gameEvents.delete(64);
+
+// // 3. Print the following string to the console: "An event happened, on average, every 9 minutes"
+// // (keep in mind that a game has 90 minutes)
+// const eventFrequency = 90 / gameEvents.size;
+// console.log(`An event happened, on average, every ${eventFrequency} minutes`);
+
+// // 4. Loop over the events and log them to the console,
+// // marking whether it's in the first half or second half (after 45 min) of the game, like this:
+// // [FIRST HALF] 17: ⚽️ GOAL
+// for (const [time, event] of gameEvents) {
+//   const half = time <= 45 ? 'FIRST' : 'SECOND';
+//   console.log(`[${half} HALF] ${time}: ${event}`);
+// }
+
+// Playing with string
+
+// const airline = 'TAP Air Portugal';
+// const plane = 'A320';
+
+// const checkMiddleSeat = function (seat) {
+//   const col = seat.slice(-1).toUpperCase();
+//   return col == 'B' || col == 'E';
+// };
+
+// const capitalizeName = function (name) {
+//   const capitalized = name.split(' ').map(word => {
+//     const [first, ...rest] = word.toLowerCase();
+//     return first.toUpperCase() + rest.join('');
+//   });
+//   console.log(capitalized.join(' '));
+// };
+
+// capitalizeName('jessica ann smith davis');
+// capitalizeName('jonas schmedtmann');
+// capitalizeName('seongwOO kIM');
+
+// const maskCard = function (number) {
+//   // split
+//   let numbers = number.split('-');
+//   // remove except the first and padEnd *
+//   numbers = numbers.map(number => number[0].padEnd(4, '*'));
+//   console.log(numbers.join('-'));
+// };
+// maskCard('5288-1500-0143-1704');
+
+// const randomCard = function () {
+//   const numbers = [];
+//   for (let i = 0; i < 4; i++) {
+//     let digit = new String(Math.trunc(Math.random() * 1e4));
+//     digit.padEnd(4, '0');
+//     numbers.push(digit);
+//   }
+//   console.log(numbers.join('-'));
+//   return numbers.join('-');
+// };
+// randomCard();
+
+// Challenge #4
 /* 
-Let's continue with our football betting app! 
-This time, we have a map with a log of the events that happened during the game. 
-The values are the events themselves, and the keys are the minutes in which each event happened 
-(a football game has 90 minutes plus some extra time).
+Write a program that receives a list of variable names written in underscore_case and convert them to camelCase.
+
+The input will come from a textarea inserted into the DOM (see code below), and conversion will happen when the button is pressed.
+
+THIS TEST DATA (pasted to textarea)
+underscore_case
+ first_name
+Some_Variable 
+  calculate_AGE
+delayed_departure
+
+SHOULD PRODUCE THIS OUTPUT (5 separate console.log outputs)
+underscoreCase      ✅
+firstName           ✅✅
+someVariable        ✅✅✅
+calculateAge        ✅✅✅✅
+delayedDeparture    ✅✅✅✅✅
+
+HINT 1: Remember which character defines a new line in the textarea 😉
+HINT 2: The solution only needs to work for a variable made out of 2 words, like a_b
+HINT 3: Start without worrying about the ✅. Tackle that only after you have the variable name conversion working 😉
+HINT 4: This challenge is difficult on purpose, so start watching the solution in case you're stuck. Then pause and continue!
+
+Afterwards, test with your own test data!
+
+GOOD LUCK 😀
 */
 
-//1. Create an array 'events' of the different game events that happened (no duplicates)
-const events = new Set(gameEvents.values());
-console.log(events);
+// const camelCase = function (str) {
+//   const words = str.toLowerCase().trim().split('_');
+//   const capitalize = str => str[0].toUpperCase() + str.slice(1);
+//   for (let i = 1; i < words.length; i++) words[i] = capitalize(words[i]);
+//   return words.join('');
+// };
 
-// 2. After the game has finished, is was found that the yellow card from minute 64 was unfair.
-// So remove this event from the game events log.
-gameEvents.delete(64);
+// const testCases = `underscore_case
+//  first_name
+// Some_Variable
+//  calculate_AGE
+// delayed_departure`;
 
-// 3. Print the following string to the console: "An event happened, on average, every 9 minutes"
-// (keep in mind that a game has 90 minutes)
-const eventFrequency = 90 / gameEvents.size;
-console.log(`An event happened, on average, every ${eventFrequency} minutes`);
+// for (const [i, word] of testCases.split('\n').entries()) {
+//   console.log(camelCase(word).padEnd(20, ' ') + '✅'.repeat(i + 1));
+// }
 
-// 4. Loop over the events and log them to the console,
-// marking whether it's in the first half or second half (after 45 min) of the game, like this:
-// [FIRST HALF] 17: ⚽️ GOAL
-for (const [time, event] of gameEvents) {
-  const half = time <= 45 ? 'FIRST' : 'SECOND';
-  console.log(`[${half} HALF] ${time}: ${event}`);
-}
+// String Methods Practice
+
+const displayFlights = function (flights) {
+  for (const flight of flights.split('+')) {
+    const [status, from, to, time] = parseFlight(flight);
+    let display = '';
+    display += status.startsWith('Delayed') ? '🔴 ' : '';
+    display += `${status} from ${from} to ${to} (${time})`;
+    display = display.padStart(45);
+    console.log(display);
+  }
+};
+const parseFlight = function (flight) {
+  const [status, from, to, time] = flight.split(';');
+  const parsed = [];
+  parsed.push(status.replaceAll('_', ' ').trim());
+  parsed.push(from.slice(0, 3).toUpperCase());
+  parsed.push(to.slice(0, 3).toUpperCase());
+  parsed.push(time.replace(':', 'h'));
+  return parsed;
+};
+displayFlights(flights);

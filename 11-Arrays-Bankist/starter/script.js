@@ -83,7 +83,6 @@ const createUsernames = accounts =>
         .map(name => name[0])
         .join(''))
   );
-createUsernames(accounts);
 
 const displayMovements = movements => {
   containerMovements.innerHTML = '';
@@ -108,39 +107,94 @@ const displayMovements = movements => {
 };
 
 const calcBalance = movements => movements.reduce((acc, move) => acc + move, 0);
-
 const calcSumIn = movements =>
   movements.filter(move => move > 0).reduce((acc, move) => acc + move, 0);
-
 const calcSumOut = movements =>
   movements.filter(move => move < 0).reduce((acc, move) => acc + move, 0);
-
-const calcSumInterest = (movements, interestRate = 1.2) =>
+const calcSumInterest = (movements, interestRate) =>
   movements
     .filter(move => move > 0)
     .map(deposit => (deposit * interestRate) / 100)
     .filter((interest, i, arr) => interest >= i)
     .reduce((acc, interest) => acc + interest, 0);
 
-const displayBalances = movements => {
+const displaySummaries = (movements, interestRate = 1.2) => {
   labelBalance.textContent = calcBalance(movements) + '€';
   labelSumIn.textContent = calcSumIn(movements) + '€';
   labelSumOut.textContent = calcSumOut(movements) + '€';
-  labelSumInterest.textContent = calcSumInterest(movements) + '€';
+  labelSumInterest.textContent = calcSumInterest(movements, interestRate) + '€';
+};
+
+const updateNumbers = (account = currentAccount) => {
+  displayMovements(account.movements);
+  displaySummaries(account.movements, account.interestRate);
 };
 
 // Event handler
+
+createUsernames(accounts);
+let currentAccount;
+
 btnLogin.addEventListener('click', e => {
   e.preventDefault();
-  const accountIndex = accounts.find(account => {
-    account.username == inputLoginUsername.value &&
-      account.pin == inputLoginPin.value;
+  // check id and pin and find an account
+  currentAccount = accounts.find(account => {
+    return (
+      account.username == inputLoginUsername.value &&
+      account.pin == Number(inputLoginPin.value)
+    );
   });
-  console.log(accountIndex);
+
+  if (currentAccount) {
+    console.log(`logged in as ${currentAccount.owner}`);
+  } else {
+    console.log('log in failed');
+    return;
+  }
+
+  // if logged in,
+  // welcome message
+  labelWelcome.textContent = `Welcome back ${currentAccount.owner
+    .split(' ')
+    .at(0)}`;
+
+  // hide login inputs and buttons
+  inputLoginPin.style.display =
+    inputLoginUsername.style.display =
+    btnLogin.style.display =
+      'display';
+  inputLoginPin.blur();
+
+  // display movements and balances
+  updateNumbers(currentAccount);
+  containerApp.style.opacity = 1;
 });
 
-displayMovements(movements);
-displayBalances(movements);
+btnTransfer.addEventListener('click', e => {
+  e.preventDefault();
+  const currentBalance = calcBalance(currentAccount.movements);
+  const transferAmount = Number(inputTransferAmount.value);
+  // check if amount is more than I have
+  if (currentBalance < transferAmount) {
+    console.log(
+      `You have ${currentBalance} which is less than ${transferAmount}`
+    );
+    return;
+  }
+  // find if toAccount exists
+  const transferAccount = accounts.find(
+    account => account.username === inputTransferTo.value
+  );
+  if (!transferAccount) {
+    console.log(`Failed to find a user named ${inputTransferTo.value}`);
+    return;
+  }
+  // transaction
+  currentAccount.movements.push(-transferAmount);
+  transferAccount.movements.push(transferAmount);
+  // refresh information
+  updateNumbers();
+});
 
 ///////////////////////////////////////
 // Coding Challenge #1

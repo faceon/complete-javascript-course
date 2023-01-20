@@ -74,27 +74,11 @@ const currencies = new Map([
 const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 /////////////////////////////////////////////////
-const createUsernames = accounts =>
-  accounts.forEach(
-    account =>
-      (account.username = account.owner
-        .toLowerCase()
-        .split(' ')
-        .map(name => name[0])
-        .join(''))
-  );
-
-const displayMovements = movements => {
+const displayMovements = (account, sort = false) => {
+  const movements = sort
+    ? account.movements.slice().sort((a, b) => a - b)
+    : account.movements;
   containerMovements.innerHTML = '';
-  // movements.forEach(move => {
-  //   const row = document.createElement('div');
-  //   row.classList.add('movements__row');
-  //   const value = document.createElement('div');
-  //   value.classList.add('movements__value');
-  //   value.textContent = move;
-  //   row.appendChild(value);
-  //   containerMovements.appendChild(row);
-  // });
   movements.forEach((move, i, arr) => {
     const type = move > 0 ? 'deposit' : 'withdrawal';
     const html = `<div class="movements__row">
@@ -106,35 +90,62 @@ const displayMovements = movements => {
   });
 };
 
-const calcBalance = movements => movements.reduce((acc, move) => acc + move, 0);
-const calcSumIn = movements =>
-  movements.filter(move => move > 0).reduce((acc, move) => acc + move, 0);
-const calcSumOut = movements =>
-  movements.filter(move => move < 0).reduce((acc, move) => acc + move, 0);
-const calcSumInterest = (movements, interestRate) =>
-  movements
+const calcBalance = account => {
+  account.balance = account.movements.reduce((acc, move) => acc + move, 0);
+  labelBalance.textContent = account.balance + '€';
+};
+
+const calcSumIn = account => {
+  account.sumIn = account.movements
     .filter(move => move > 0)
-    .map(deposit => (deposit * interestRate) / 100)
-    .filter((interest, i, arr) => interest >= i)
+    .reduce((acc, move) => acc + move, 0);
+  labelSumIn.textContent = account.sumIn + '€';
+};
+
+const calcSumOut = account => {
+  account.sumOut = account.movements
+    .filter(move => move < 0)
+    .reduce((acc, move) => acc + move, 0);
+  labelSumOut.textContent = account.sumOut + '€';
+};
+
+const calcSumInterest = account => {
+  account.sumInterest = account.movements
+    .filter(move => move > 0)
+    .map(deposit => (deposit * account.interestRate) / 100)
+    .filter((interest, i) => interest >= i)
     .reduce((acc, interest) => acc + interest, 0);
-
-const displaySummaries = (movements, interestRate = 1.2) => {
-  labelBalance.textContent = calcBalance(movements) + '€';
-  labelSumIn.textContent = calcSumIn(movements) + '€';
-  labelSumOut.textContent = calcSumOut(movements) + '€';
-  labelSumInterest.textContent = calcSumInterest(movements, interestRate) + '€';
+  labelSumInterest.textContent = account.sumInterest + '€';
 };
 
-const updateNumbers = (account = currentAccount) => {
-  displayMovements(account.movements);
-  displaySummaries(account.movements, account.interestRate);
+const updateUI = (account = currentAccount) => {
+  displayMovements(account);
+  calcBalance(account);
+  calcSumIn(account);
+  calcSumOut(account);
+  calcSumInterest(account);
 };
 
-// Event handler
+const createUsernames = accounts => {
+  accounts.forEach(
+    account =>
+      (account.username = account.owner
+        .toLowerCase()
+        .split(' ')
+        .map(name => name[0])
+        .join(''))
+  );
+};
 
 createUsernames(accounts);
 let currentAccount;
 
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+// Event handler
+
+/////////////////////////////////////////////////
+// Login
 btnLogin.addEventListener('click', e => {
   e.preventDefault();
   // check id and pin and find an account
@@ -166,22 +177,23 @@ btnLogin.addEventListener('click', e => {
   inputLoginPin.blur();
 
   // display movements and balances
-  updateNumbers(currentAccount);
+  updateUI();
   containerApp.style.opacity = 1;
 });
 
+/////////////////////////////////////////////////
+// Transfer money
 btnTransfer.addEventListener('click', e => {
   e.preventDefault();
-  const currentBalance = calcBalance(currentAccount.movements);
   const transferAmount = Number(inputTransferAmount.value);
   // check if amount is more than I have
-  if (currentBalance < transferAmount) {
+  if (currentAccount.balance < transferAmount) {
     console.log(
-      `You have ${currentBalance} which is less than ${transferAmount}`
+      `You have ${currentAccount.balance} which is less than ${transferAmount}`
     );
     return;
   }
-  // find if toAccount exists
+  // find if toAccount exists or it is myself
   const transferAccount = accounts.find(
     account => account.username === inputTransferTo.value
   );
@@ -189,11 +201,75 @@ btnTransfer.addEventListener('click', e => {
     console.log(`Failed to find a user named ${inputTransferTo.value}`);
     return;
   }
+  if (transferAccount.username === currentAccount.username) {
+    console.log('You cannot transfer to yourself!');
+    return;
+  }
   // transaction
   currentAccount.movements.push(-transferAmount);
   transferAccount.movements.push(transferAmount);
-  // refresh information
-  updateNumbers();
+  console.log(`transfered ${transferAmount} to ${transferAccount.owner}`);
+  // refresh UI
+  inputTransferAmount.value = inputTransferTo.value = '';
+  updateUI();
+});
+
+/////////////////////////////////////////////////
+// Loan
+btnLoan.addEventListener('click', e => {
+  e.preventDefault();
+  const loanAmount = Number(inputLoanAmount.value);
+  if (
+    loanAmount > 0 &&
+    currentAccount.movements.some(move => move >= loanAmount * 0.1)
+  ) {
+    currentAccount.movements.push(loanAmount);
+    updateUI(currentAccount);
+  } else {
+    console.log('You requested too much loan');
+  }
+});
+
+/////////////////////////////////////////////////
+// Close account
+btnClose.addEventListener('click', e => {
+  e.preventDefault();
+  // return index of a user with username and PIN
+  if (
+    currentAccount.username !== inputCloseUsername.value ||
+    currentAccount.pin !== Number(inputClosePin.value)
+  ) {
+    console.log('Check your username and PIN');
+    return;
+  }
+  const userIndex = accounts.findIndex(
+    account => account.username === inputCloseUsername.value
+  );
+  // splice the index
+  accounts.splice(userIndex, 1);
+  inputCloseUsername.value = inputClosePin.value = '';
+  containerApp.style.opacity = 0;
+  console.log('User account was deleted');
+});
+
+/////////////////////////////////////////////////
+// Sort
+let sortDown = false;
+btnSort.addEventListener('click', e => {
+  e.preventDefault();
+  sortDown = !sortDown;
+  displayMovements(currentAccount, sortDown);
+});
+
+/////////////////////////////////////////////////
+// Array.from
+let movementsUI;
+document.addEventListener('click', () => {
+  movementsUI = document.querySelectorAll('.movements__value');
+  movementsUI = Array.from(
+    movementsUI,
+    move => (move.textContent = move.textContent.replace('€', '💶'))
+  );
 });
 
 ///////////////////////////////////////
@@ -301,3 +377,113 @@ const chainAverageHumanAge = ages =>
 
 // find an account with a name with three words
 // console.log(accounts.find(account => account.owner.split(' ').length == 3));
+
+////////////////////////////////////////////////////////
+// Array method practice
+
+let bankDepositSum = accounts
+  .map(acc => acc.movements)
+  .flat()
+  .filter(move => move > 0)
+  .reduce((sum, move) => sum + move, 0);
+
+bankDepositSum = accounts
+  .flatMap(acc => acc.movements)
+  .filter(move => move > 0)
+  .reduce((sum, move) => sum + move, 0);
+
+let over1kDeposits = accounts
+  .flatMap(cur => cur.movements)
+  .filter(cur => cur > 1000).length;
+
+over1kDeposits = accounts
+  .flatMap(cur => cur.movements)
+  .reduce((count, cur) => (cur > 1000 ? ++count : count), 0);
+
+let sumInOut = accounts
+  .flatMap(cur => cur.movements)
+  .reduce(
+    (sum, cur) => {
+      if (cur > 0) sum.in++;
+      if (cur < 0) sum.out++;
+      return sum;
+    },
+    { in: 0, out: 0 }
+  );
+
+sumInOut = accounts.reduce(
+  (sum, acc) => {
+    acc.movements.reduce((sum, move) => {
+      sum[move > 0 ? 'in' : 'out'] += move;
+      return sum;
+    }, sum);
+    return sum;
+  },
+  { in: 0, out: 0 }
+);
+
+const title = 'this is a nice title';
+const expections = ['a', 'an', 'the', 'but', 'or', 'on', 'in', 'with'];
+
+let convertTitleCase = title =>
+  title
+    .toLowerCase()
+    .split(' ')
+    .map(str =>
+      expections.includes(str) ? str : str[0].toUpperCase() + str.slice(1)
+    )
+    .join(' ');
+
+///////////////////////////////////////
+// Coding Challenge #4
+
+/* 
+Julia and Kate are still studying dogs, and this time they are studying if dogs are eating too much or too little.
+Eating too much means the dog's current food portion is larger than the recommended portion, and eating too little is the opposite.
+Eating an okay amount means the dog's current food portion is within a range 10% above and 10% below the recommended portion (see hint).
+
+1. Loop over the array containing dog objects, and for each dog, 
+calculate the recommended food portion and add it to the object as a new property. 
+Do NOT create a new array, simply loop over the array. 
+Forumla: recommendedFood = weight ** 0.75 * 28. (The result is in grams of food, and the weight needs to be in kg)
+
+2. Find Sarah's dog and log to the console whether it's eating too much or too little. 
+HINT: Some dogs have multiple owners, so you first need to find Sarah in the owners array, 
+and so this one is a bit tricky (on purpose) 🤓
+
+3. Create an array containing all owners of dogs who eat too much ('ownersEatTooMuch') 
+and an array with all owners of dogs who eat too little ('ownersEatTooLittle').
+
+4. Log a string to the console for each array created in 3., 
+like this: "Matilda and Alice and Bob's dogs eat too much!" and "Sarah and John and Michael's dogs eat too little!"
+
+5. Log to the console whether there is any dog eating EXACTLY the amount of food that is recommended (just true or false)
+
+6. Log to the console whether there is any dog eating an OKAY amount of food (just true or false)
+
+7. Create an array containing the dogs that are eating an OKAY amount of food (try to reuse the condition used in 6.)
+
+8. Create a shallow copy of the dogs array and sort it by recommended food portion in an ascending order (keep in mind that the portions are inside the array's objects)
+
+HINT 1: Use many different tools to solve these challenges, you can use the summary lecture to choose between them 😉
+HINT 2: Being within a range 10% above and below the recommended portion means: current > (recommended * 0.90) && current < (recommended * 1.10). Basically, the current portion should be between 90% and 110% of the recommended portion.
+
+TEST DATA:
+
+GOOD LUCK 😀
+*/
+
+const dogs = [
+  { weight: 22, curFood: 250, owners: ['Alice', 'Bob'] },
+  { weight: 8, curFood: 200, owners: ['Matilda'] },
+  { weight: 13, curFood: 275, owners: ['Sarah', 'John'] },
+  { weight: 32, curFood: 340, owners: ['Michael'] },
+];
+
+dogs.forEach(dog => (dog.recommendedFood = dog.weight ** 0.75 * 28));
+console.log(dogs);
+
+const isSarahsOvereating = dogs
+  .filter(dog => dog.owners.includes('Sarah'))
+  .some(dog => dog.recommendedFood * 1.1 < dog.curFood);
+console.log(`Sarah's dog is overeating?: ${isSarahsOvereating}`);

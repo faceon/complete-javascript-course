@@ -480,10 +480,50 @@ const dogs = [
   { weight: 32, curFood: 340, owners: ['Michael'] },
 ];
 
-dogs.forEach(dog => (dog.recommendedFood = dog.weight ** 0.75 * 28));
-console.log(dogs);
+// 1.
+dogs.forEach(
+  dog => (dog.recommendedFood = Math.trunc(dog.weight ** 0.75 * 28))
+);
+// console.log(dogs);
 
+// 2.
 const isSarahsOvereating = dogs
   .filter(dog => dog.owners.includes('Sarah'))
   .some(dog => dog.recommendedFood * 1.1 < dog.curFood);
-console.log(`Sarah's dog is overeating?: ${isSarahsOvereating}`);
+// console.log(`Sarah's dog is overeating?: ${isSarahsOvereating}`);
+
+// 3.
+const { much: ownersEatTooMuch, little: ownersEatTooLittle } = dogs.reduce(
+  (acc, dog) => {
+    if (dog.curFood > dog.recommendedFood * 1.1) {
+      acc.much = acc.much.concat(dog.owners);
+    } else if (dog.curFood < dog.recommendedFood * 0.9) {
+      acc.little = acc.little.concat(dog.owners);
+    }
+    return acc;
+  },
+  { much: [], little: [] }
+);
+
+// 4.
+// console.log(`${ownersEatTooMuch.join(' and ')}'s dogs eat too much!`);
+// console.log(`${ownersEatTooLittle.join(' and ')}'s dogs eat too little!`);
+
+// 5.
+const isAnyEatingExactly = dogs.some(dog => dog.curFood == dog.recommendedFood);
+// console.log(`Is there any dog eating exactly?: ${isAnyEatingExactly}`);
+
+// 6.
+const isEatingOk = dog =>
+  dog.curFood < dog.recommendedFood * 1.1 &&
+  dog.curFood > dog.recommendedFood * 0.9;
+const isAnyEatingOk = dogs.some(isEatingOk);
+// console.log(`Is there any dog eating just ok?: ${isAnyEatingOk}`);
+
+// 7.
+// console.log(dogs.filter(isEatingOk));
+
+// 8.
+const recommendedSorted = dogs
+  .slice()
+  .sort((a, b) => a.recommendedFood - b.recommendedFood);

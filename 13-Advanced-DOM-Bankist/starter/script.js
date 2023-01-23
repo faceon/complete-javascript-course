@@ -44,3 +44,12 @@ header.append(message);
 
 const btnCloseCookie = document.querySelector('.btn--close-cookie');
 btnCloseCookie.addEventListener('click', () => message.remove());
+
+// Styles
+message.style.backgroundColor = '#37383d';
+message.style.width = '110%';
+message.style.height =
+  Number.parseFloat(getComputedStyle(message).height) + 40 + 'px';
+
+// Attributes
+const logo = document.querySelector('.nav__logo');

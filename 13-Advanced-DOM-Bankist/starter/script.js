@@ -53,3 +53,41 @@ message.style.height =
 
 // Attributes
 const logo = document.querySelector('.nav__logo');
+
+//// Smooth scroll
+const btnScrollTo = document.querySelector('.btn--text.btn--scroll-to');
+const s1 = document.getElementById('section--1');
+
+// window.addEventListener('click', e => {
+//   const s1bounding = s1.getBoundingClientRect();
+//   console.log('section1', s1bounding.x, s1bounding.y);
+//   console.log('cursor', e.clientX, e.clientY);
+//   console.log('window', window.scrollX, window.scrollY);
+//   console.log(
+//     'document',
+//     document.documentElement.clientWidth,
+//     document.documentElement.clientHeight
+//   );
+// });
+
+btnScrollTo.addEventListener('click', e => {
+  const s1bounding = s1.getBoundingClientRect();
+  window.scrollTo({
+    left: s1bounding.left + window.scrollX,
+    top: s1bounding.top + window.scrollY,
+    behavior: 'smooth',
+  });
+  // s1.scrollIntoView({ behavior: 'smooth' });
+});
+
+const alertH1 = e => {
+  console.log('You are reading H1');
+};
+const h1 = document.querySelector('h1');
+// h1.onmouseenter = () => console.log('Triggered by onmouseneter');
+h1.addEventListener('mouseenter', alertH1);
+
+//// Event Bubbling
+const randomInt = ({ min = 0, max = 255 }) =>
+  Math.floor(Math.random() * (max - min + 1) + min);
+const randomColor = () => `rgb(${Array(3).fill(0).map(randomInt).join(',')})`;

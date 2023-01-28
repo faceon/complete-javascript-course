@@ -304,8 +304,6 @@ const lazyObserver = new IntersectionObserver(loadImage, {
 lazyImages.forEach(img => lazyObserver.observe(img));
 
 //// Slider
-let curSlide = 1;
-const slides = document.querySelectorAll('.slide');
 
 // first attempt
 // const moveX = {
@@ -339,22 +337,60 @@ const slides = document.querySelectorAll('.slide');
 // moveSlides(curSlide);
 
 // second attempt
+let curSlide = 1;
+const slides = document.querySelectorAll('.slide');
+const dotContainer = document.querySelector('.dots');
+
+// dots
+slides.forEach((_, i) => {
+  dotContainer.insertAdjacentHTML(
+    'beforeend',
+    `<button class="dots__dot" data-slide="${i + 1}"></button>`
+  );
+});
+const dots = dotContainer.querySelectorAll('.dots__dot');
+
+dotContainer.addEventListener('click', e => {
+  if (!e.target.classList.contains('dots__dot')) return;
+  goToSlide(e.target.dataset.slide);
+});
+
 const goToSlide = function (slideNum) {
   slideNum ??= 1;
   curSlide =
     slideNum < 1 ? slides.length : slideNum > slides.length ? 1 : slideNum;
+
   slides.forEach((slide, i) => {
     slide.style.transform = `translateX(${100 * (1 - curSlide + i)}%)`;
+    if (curSlide == i + 1) dots[i].classList.add('dots__dot--active');
+    else dots[i].classList.remove('dots__dot--active');
   });
 };
 goToSlide(1);
+
+// button left and right
 const prevSlide = () => goToSlide(--curSlide);
 const nextSlide = () => goToSlide(++curSlide);
+const btnLeft = document.querySelector('.slider__btn--left');
+const btnRight = document.querySelector('.slider__btn--right');
+btnLeft.addEventListener('click', prevSlide);
+btnRight.addEventListener('click', nextSlide);
 
-document
-  .querySelector('.slider__btn--left')
-  .addEventListener('click', prevSlide);
+// keyboard shortcut
+document.addEventListener('keydown', e => {
+  if (e.key == 'ArrowLeft') prevSlide();
+  if (e.key == 'ArrowRight') nextSlide();
+});
 
-document
-  .querySelector('.slider__btn--right')
-  .addEventListener('click', nextSlide);
+//// Lifecycle DOM Events
+// document.addEventListener('DOMContentLoaded', function (e) {
+//   console.log('HTML parsed and DOM tree built', e);
+// });
+// window.addEventListener('load', function (e) {
+//   console.log('Page fully loaded', e);
+// });
+// window.addEventListener('beforeunload', function (e) {
+//   e.preventDefault();
+//   console.log(e);
+//   e.returnValue = '';
+// });

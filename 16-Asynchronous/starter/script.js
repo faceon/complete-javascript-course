@@ -64,7 +64,11 @@ const getJson = function (country, countryGeo) {
   return fetch(url).then(res => {
     // if query by country name does not exist, query by country code
     if (!res.ok && res.status == 404 && countryGeo) {
-      return getJsonByCode(countryGeo.state);
+      return getJsonByCode(
+        Object.keys(countryGeo.state).length !== 0
+          ? countryGeo.state
+          : countryGeo.prov
+      );
     }
     // console.log(res);
     return res.json();
@@ -109,10 +113,89 @@ const getClosestCountry = function (countryArr, countryGeo) {
   return countryCopy[0];
 };
 
+///////////////////////////////////////////////////////
+//// Event loop in practice
+// console.log('Test start');
+// setTimeout(() => console.log('0 sec timer'), 0);
+// Promise.resolve('Resolved promise 1').then(res => console.log(res));
+// Promise.resolve('Resolved promise 2').then(res => {
+//   for (let i = 1; i < 1e9; i++) {
+//     if (i % 1e8 === 0) console.log(i);
+//   }
+//   console.log(res);
+// });
+// console.log('Test end');
+
+// const countdown = function (seconds) {
+//   return new Promise(function (resolve, reject) {
+//     let interval;
+//     const failOrNot = () => {
+//       console.log(seconds);
+//       if (Math.random() < 0.05) {
+//         clearInterval(interval);
+//         reject(`Launch failed at ${seconds}`);
+//       }
+//       if (seconds === 0) {
+//         clearInterval(interval);
+//         resolve('Take off! Launch success!!');
+//       }
+//       seconds--;
+//     };
+//     interval = setInterval(failOrNot, 1000);
+//   });
+// };
+// const launch = countdown(10).then(console.log).catch(console.error);
+// console.log(launch);
+
+// const wait = function (seconds) {
+//   return new Promise(resolve => {
+//     setTimeout(() => resolve(`I've waited ${seconds} seconds`), seconds * 1000);
+//   });
+// };
+
+// const anotherWait = function (res) {
+//   console.log(res);
+//   return wait(Math.floor(Math.random() * 5));
+// };
+
+// wait(1)
+//   .then(anotherWait)
+//   .then(anotherWait)
+//   .then(anotherWait)
+//   .then(anotherWait)
+//   .then(anotherWait)
+//   .then(anotherWait)
+//   .then(anotherWait)
+//   .then(anotherWait)
+//   .then(anotherWait)
+//   .then(anotherWait)
+//   .then(anotherWait)
+//   .then(anotherWait);
+
+////////////////////////////////////
+// Where Am I using geolocation
+
+// const getPosition = function () {
+//   return new Promise(function (resolve, reject) {
+//     navigator.geolocation.getCurrentPosition(resolve, reject);
+//   });
+// };
+
 const whereAmI = function (lat, lng) {
-  fetch(
-    `https://geocode.xyz/${lat},${lng}?geoit=json&auth=630272418266632468282x47134`
-  )
+  const getPosition = new Promise(function (resolve, reject) {
+    if (isFinite(lat) && isFinite(lng)) {
+      resolve({ coords: { latitude: lat, longitude: lng } });
+    } else {
+      navigator.geolocation.getCurrentPosition(resolve, reject);
+    }
+  });
+  getPosition
+    .then(position => {
+      const { latitude: lat, longitude: lng } = position.coords;
+      return fetch(
+        `https://geocode.xyz/${lat},${lng}?geoit=json&auth=630272418266632468282x47134`
+      );
+    })
     .then(res => {
       // console.log(res);
       if (!res.ok) throw new Error(res);
@@ -134,26 +217,5 @@ const whereAmI = function (lat, lng) {
 // whereAmI(37.5167784, 126.979882); // Caelitus
 // whereAmI(34.306915, -118.421672);
 // whereAmI(-1000, -1000);
-
-//// Event loop in practice
-// console.log('Test start');
-// setTimeout(() => console.log('0 sec timer'), 0);
-// Promise.resolve('Resolved promise 1').then(res => console.log(res));
-// Promise.resolve('Resolved promise 2').then(res => {
-//   for (let i = 1; i < 1e9; i++) {
-//     if (i % 1e8 === 0) console.log(i);
-//   }
-//   console.log(res);
-// });
-// console.log('Test end');
-
-const willYouCome = new Promise(function (resolve, reject) {
-  if (Math.random() >= 0.5) {
-    resolve('I will be there');
-  } else {
-    reject('I dont want to go');
-  }
-});
-
-// willYouCome.then(res => console.log(res)).catch(err => console.error(err));
-willYouCome.then(res => console.log(res)).catch(err => console.error(err));
+// whereAmI(36.497194, 36.350183); // Turkey, earthquaked
+// whereAmI();

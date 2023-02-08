@@ -89,10 +89,11 @@ class App {
   }
 
   _getPosition() {
-    this._loadMap({ coords: { latitude: 37.5167784, longitude: 126.979882 } }); // Caelitus
-    // this._loadMap({ coords: { latitude: 37.5305, longitude: 126.968 }); // Hyel
-    // navigator.geolocation?.getCurrentPosition(this._loadMap.bind(this), err =>
-    //   console.log(err)
+    // this._loadMap({ coords: { latitude: 37.5167784, longitude: 126.979882 } }); // Caelitus
+    this._loadMap({ coords: { latitude: 37.5305, longitude: 126.968 } }); // Hyel
+    // navigator.geolocation?.getCurrentPosition(
+    //   this._loadMap.bind(this),
+    //   console.error
     // );
   }
 

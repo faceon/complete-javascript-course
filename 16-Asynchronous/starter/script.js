@@ -147,30 +147,19 @@ const getClosestCountry = function (countryArr, countryGeo) {
 // const launch = countdown(10).then(console.log).catch(console.error);
 // console.log(launch);
 
-// const wait = function (seconds) {
-//   return new Promise(resolve => {
-//     setTimeout(() => resolve(`I've waited ${seconds} seconds`), seconds * 1000);
-//   });
-// };
+const wait = function (seconds) {
+  return new Promise(resolve => {
+    setTimeout(() => resolve(`I've waited ${seconds} seconds`), seconds * 1000);
+  });
+};
 
-// const anotherWait = function (res) {
-//   console.log(res);
-//   return wait(Math.floor(Math.random() * 5));
-// };
+const anotherWait = function (res) {
+  console.log(res);
+  return wait(Math.floor(Math.random() * 5));
+};
 
 // wait(1)
 //   .then(anotherWait)
-//   .then(anotherWait)
-//   .then(anotherWait)
-//   .then(anotherWait)
-//   .then(anotherWait)
-//   .then(anotherWait)
-//   .then(anotherWait)
-//   .then(anotherWait)
-//   .then(anotherWait)
-//   .then(anotherWait)
-//   .then(anotherWait)
-//   .then(anotherWait);
 
 ////////////////////////////////////
 // Where Am I using geolocation
@@ -219,3 +208,35 @@ const whereAmI = function (lat, lng) {
 // whereAmI(-1000, -1000);
 // whereAmI(36.497194, 36.350183); // Turkey, earthquaked
 // whereAmI();
+
+//////////////////////////////////////////////////////////////
+// Challenge #2
+const imageContainer = document.querySelector('.images');
+const createImage = function (imgPath) {
+  return new Promise(function (resolve, reject) {
+    // create img element
+    const img = document.createElement('img');
+    // If image loading is done, resolve with img element
+    img.src = imgPath;
+    img.classList.add('images');
+    img.addEventListener('load', () => resolve(img));
+    // else reject
+    img.addEventListener('error', () =>
+      reject(new Error('Error when loading image'))
+    );
+  });
+};
+
+createImage('img/img-3.jpg')
+  .then(img => {
+    imageContainer.insertAdjacentElement('afterbegin', img);
+    return img;
+  })
+  .then(img =>
+    wait(2).then(msg => {
+      console.log(msg);
+      img.style.display = 'none';
+      return img;
+    })
+  )
+  .catch(console.error);

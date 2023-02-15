@@ -6,17 +6,6 @@ import errorView from './views/errorView';
 // import icons from 'url:../img/icons.svg'; // Parcel 2
 
 const recipeContainer = document.querySelector('.recipe');
-const timeout = function (s) {
-  return new Promise(function (_, reject) {
-    setTimeout(function () {
-      reject(new Error(`Request took too long! Timeout after ${s} second`));
-    }, s * 1000);
-  });
-};
-
-////////////////////////////////////////////////////////
-// helper functions
-// spinner graphic to show while fetching
 
 ///////////////////////////////////////
 const showRecipe = async function () {

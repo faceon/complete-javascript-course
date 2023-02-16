@@ -1,17 +1,22 @@
 import icons from 'url:../../img/icons.svg'; // Parcel 2
 import { Fraction } from 'fractional';
 
-class RecipeView {
+export class RecipeView {
   #parentElement = document.querySelector('.recipe');
+  #errorMessages = {
+    default: 'Sorry, something went wrong',
+    400: 'We could not find that recipe. Please try another one.',
+    504: 'Getting the recipe took too long. Please try again.',
+  };
   constructor() {}
 
-  render = function (data) {
+  render(data) {
     const markup = this.#getMarkup(data);
     this.#clear();
     this.#parentElement.insertAdjacentHTML('beforeend', markup);
-  };
+  }
 
-  renderSpinner = function () {
+  renderSpinner() {
     this.#clear();
     this.#parentElement.insertAdjacentHTML(
       'afterbegin',
@@ -21,9 +26,9 @@ class RecipeView {
         </svg>
       </div>`
     );
-  };
+  }
 
-  #getMarkup = function (data) {
+  #getMarkup(data) {
     return `
     <figure class="recipe__fig">
       <img src="${data.imgSrc}" alt="${data.title}" class="recipe__img" />
@@ -121,11 +126,51 @@ class RecipeView {
       </a>
     </div>
   `;
-  };
+  }
 
-  #clear = function () {
+  #clear() {
     this.#parentElement.innerHTML = '';
-  };
+  }
+
+  addHandlerRender(handler) {
+    ['hashchange', 'load'].forEach(event =>
+      window.addEventListener(event, handler)
+    );
+  }
+
+  renderError(err) {
+    const errorMessage =
+      this.#errorMessages[err.cause] ?? this.#errorMessages.default;
+    const errorMarkup = `
+      <div class="error">
+        <div>
+          <svg>
+            <use href="${icons}#icon-alert-triangle"></use>
+          </svg>
+        </div>
+        <p>${errorMessage}</p>
+      </div>
+    `;
+    this.#clear();
+    this.#parentElement.insertAdjacentHTML('beforeend', errorMarkup);
+  }
+
+  renderMessage(message) {
+    const messageMarkup = `
+      <div class="message">
+        <div>
+          <svg>
+            <use href="src/img/icons.svg#icon-smile"></use>
+          </svg>
+        </div>
+        <p>
+          ${message}
+        </p>
+      </div>
+    `;
+    this.#clear();
+    this.#parentElement.insertAdjacentHTML('beforeend', messageMarkup);
+  }
 }
 
 export default new RecipeView();

@@ -1,9 +1,10 @@
 ////////////////////////////////////////////////////////
-import { API_URL } from './config';
+import { API_URL, SEARCH_URL } from './config';
 import { getJSON } from './helpers';
 
 export const state = {
   recipe: {},
+  searchResults: [],
 };
 
 export const loadRecipe = async function (id) {
@@ -21,6 +22,17 @@ export const loadRecipe = async function (id) {
     };
     return state.recipe;
   } catch (err) {
-    console.error(err);
+    throw err;
+  }
+};
+
+export const searchRecipes = async function (keyword) {
+  try {
+    const data = await getJSON(SEARCH_URL + keyword);
+    const { recipes } = data.data;
+    state.searchResults = recipes;
+    return state.searchResults;
+  } catch (err) {
+    throw err;
   }
 };

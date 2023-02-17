@@ -3,54 +3,47 @@ import 'regenerator-runtime/runtime';
 import * as model from './model';
 import recipeView from './views/recipeView';
 import searchView from './views/searchView';
+import resultsView from './views/resultsView';
 
-const searchField = document.querySelector('.search__field');
-
-///////////////////////////////////////
 const controlRecipe = async function () {
   try {
-    const id = window.location.hash.slice(1);
+    const id = window.location.hash.slice(1) ?? `5ed6604591c37cdc054bc886`;
     if (!id) return;
 
     recipeView.renderSpinner();
-    const recipe = await model.loadRecipe(id);
-    recipeView.render(recipe);
+    await model.loadRecipe(id);
+    recipeView.render(model.state.recipe);
   } catch (err) {
     console.log(err);
     recipeView.renderError(err);
   }
 };
 
-const controlSearch = async function (e) {
+const controlSearch = async function () {
   try {
-    e.preventDefault();
-    const keyword = searchField.value;
-    console.log(keyword);
-    if (!keyword) return;
+    // show spinner first while retrieving search results
+    resultsView.renderSpinner();
 
-    recipeView.renderSpinner();
-    const searchResults = await model.searchRecipes(keyword);
-    searchView.render(searchResults);
-    const topResultId = searchResults.at(0).id;
-    const recipe = await model.loadRecipe(topResultId);
-    recipeView.render(recipe);
-    console.log(model.state);
+    // fetch queried results
+    const query = searchView.getQuery();
+    await model.loadSearch(query);
+
+    // load and render search results
+    const { results } = model.state.search;
+    resultsView.render(results);
   } catch (err) {
     console.log(err);
-    recipeView.renderError(err);
+    resultsView.renderError(err);
   }
 };
 
-const defaultSearch = function (keyword) {
-  searchField.value = 'kimchi';
-};
+// if (module.hot) module.hot.accept();
 
 ////////////////////////////////////////////////////////////
 // add event listeners
 const init = function () {
-  recipeView.addHandlerRender(controlRecipe);
-  searchView.addHandlerRender(controlSearch);
-  window.addEventListener('load', defaultSearch);
+  recipeView.addRenderHandler(controlRecipe);
+  searchView.addSearchHandler(controlSearch);
 };
 
 init();

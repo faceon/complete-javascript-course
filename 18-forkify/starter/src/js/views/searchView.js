@@ -1,44 +1,27 @@
-import { RecipeView } from './recipeView';
-import icons from 'url:../../img/icons.svg'; // Parcel 2
+import View from './View';
 
-class SearchView extends RecipeView {
-  #parentElement = document.querySelector('.results');
-  #searchForm = document.querySelector('.search');
+class SearchView extends View {
+  parentElement = document.querySelector('.search__field');
+  searchForm = document.querySelector('.search');
 
-  render(searchResults) {
-    this.#parentElement.innerHTML = '';
-    searchResults.forEach(this.insertMarkup.bind(this));
+  constructor() {
+    super();
+    this.parentElement.value = 'kimchi';
   }
 
-  insertMarkup(recipe) {
-    const markup = this.#getMarkup(recipe);
-    this.#parentElement.insertAdjacentHTML('beforeend', markup);
+  addSearchHandler(handler) {
+    this.searchForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      handler();
+    });
   }
 
-  #getMarkup(recipe) {
-    const markup = `
-      <li class="preview">
-        <a class="preview__link preview__link--active" href="#${recipe.id}">
-          <figure class="preview__fig">
-            <img src="${recipe.image_url}" alt="Test" />
-          </figure>
-          <div class="preview__data">
-            <h4 class="preview__title">${recipe.title}</h4>
-            <p class="preview__publisher">${recipe.publisher}</p>
-            <div class="preview__user-generated">
-              <svg>
-                <use href="${icons}#icon-user"></use>
-              </svg>
-            </div>
-          </div>
-        </a>
-      </li>
-    `;
-
-    return markup;
+  getQuery() {
+    return this.parentElement.value;
   }
-  addHandlerRender(handler) {
-    this.#searchForm.addEventListener('submit', handler);
+
+  clear() {
+    this.parentElement.value = '';
   }
 }
 

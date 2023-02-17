@@ -7,11 +7,17 @@ import resultsView from './views/resultsView';
 
 const controlRecipe = async function () {
   try {
+    // get recipe id from address
     const id = window.location.hash.slice(1) ?? `5ed6604591c37cdc054bc886`;
     if (!id) return;
 
+    // show spinner while fetching
     recipeView.renderSpinner();
+
+    // load recipe data onto state
     await model.loadRecipe(id);
+
+    // render recipe
     recipeView.render(model.state.recipe);
   } catch (err) {
     console.log(err);

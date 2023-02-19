@@ -4,9 +4,9 @@ class SearchView extends View {
   parentElement = document.querySelector('.search__field');
   searchForm = document.querySelector('.search');
 
-  constructor() {
+  constructor(defaultSearch) {
     super();
-    this.parentElement.value = 'kimchi';
+    this.parentElement.value = defaultSearch;
   }
 
   addSearchHandler(handler) {
@@ -25,4 +25,4 @@ class SearchView extends View {
   }
 }
 
-export default new SearchView();
+export default new SearchView('beef');

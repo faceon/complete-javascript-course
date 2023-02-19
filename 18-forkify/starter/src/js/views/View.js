@@ -3,11 +3,11 @@ import icons from 'url:../../img/icons.svg'; // Parcel 2
 export default class View {
   parentElement;
   icons = icons;
-  errorMessage = 'We could not find the recipe you requested';
+  errorMessage = '0 result';
 
   render(data) {
     if (!data || (Array.isArray(data) && data.length === 0)) {
-      return this.renderError();
+      return this.renderError(new Error(this.errorMessage));
     }
     const markup = this.getMarkup(data);
     this.clear();
@@ -48,8 +48,6 @@ export default class View {
   }
 
   renderError(err) {
-    this.clear();
-    const errorMessage = err?.message ?? this.errorMessage;
     const errorMarkup = `
       <div class="error">
         <div>
@@ -57,7 +55,7 @@ export default class View {
             <use href="${this.icons}#icon-alert-triangle"></use>
           </svg>
         </div>
-        <p>${errorMessage}</p>
+        <p>${err.message}</p>
       </div>
     `;
     this.clear();

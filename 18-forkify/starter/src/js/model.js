@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////
-import { API_URL, SEARCH_URL } from './config';
+import { API_URL, SEARCH_URL, ENTRIES_PER_PAGE } from './config';
 import { getJSON } from './helpers';
 
 export const state = {
@@ -7,6 +7,11 @@ export const state = {
   search: {
     query: '',
     results: [],
+  },
+  page: {
+    prev: 0,
+    cur: 0,
+    next: 0,
   },
 };
 
@@ -41,7 +46,26 @@ export const loadSearch = async function (keyword) {
         id: recipe.id,
       };
     });
+    setCurPage(1);
   } catch (err) {
     throw err;
   }
+};
+
+export const setCurPage = function (curPage) {
+  // calc prevPage and nextPage using curPage, length and entries_per_page
+  curPage = Number.parseInt(curPage);
+  const prevPage = curPage - 1;
+  const nextPage = curPage + 1;
+  const minPage = 1;
+  const maxPage = Math.ceil(state.search.results.length / ENTRIES_PER_PAGE);
+  state.page.prev = prevPage >= minPage ? prevPage : null;
+  state.page.cur = curPage;
+  state.page.next = nextPage <= maxPage ? nextPage : null;
+};
+
+export const loadCurPage = function () {
+  const firstIndex = (state.page.cur - 1) * ENTRIES_PER_PAGE;
+  const lastIndex = state.page.cur * ENTRIES_PER_PAGE;
+  return state.search.results.slice(firstIndex, lastIndex);
 };

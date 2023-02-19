@@ -36,12 +36,10 @@ const controlSearch = async function () {
     await model.loadSearch(query);
 
     // load results
-    const results = model.loadCurPage();
+    const results = model.loadCurPage(1);
 
     // render search results
     resultsView.render(results);
-
-    // render pagination
     paginationView.render(model.state.page);
   } catch (err) {
     console.log(err);
@@ -50,8 +48,7 @@ const controlSearch = async function () {
 };
 
 const controlPagination = function (pageToGo) {
-  model.setCurPage(pageToGo);
-  const results = model.loadCurPage();
+  const results = model.loadCurPage(pageToGo);
   resultsView.render(results);
   paginationView.render(model.state.page);
 };

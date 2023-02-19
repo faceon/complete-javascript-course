@@ -53,7 +53,6 @@ export const loadSearch = async function (keyword) {
 };
 
 export const setCurPage = function (curPage) {
-  // calc prevPage and nextPage using curPage, length and entries_per_page
   curPage = Number.parseInt(curPage);
   const prevPage = curPage - 1;
   const nextPage = curPage + 1;
@@ -64,7 +63,8 @@ export const setCurPage = function (curPage) {
   state.page.next = nextPage <= maxPage ? nextPage : null;
 };
 
-export const loadCurPage = function () {
+export const loadCurPage = function (curPage) {
+  setCurPage(curPage);
   const firstIndex = (state.page.cur - 1) * ENTRIES_PER_PAGE;
   const lastIndex = state.page.cur * ENTRIES_PER_PAGE;
   return state.search.results.slice(firstIndex, lastIndex);

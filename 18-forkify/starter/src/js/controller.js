@@ -5,6 +5,7 @@ import recipeView from './views/recipeView';
 import searchView from './views/searchView';
 import resultsView from './views/resultsView';
 import paginationView from './views/paginationView';
+import bookmarksView from './views/bookmarksView';
 
 const controlRecipe = async function () {
   try {
@@ -20,6 +21,10 @@ const controlRecipe = async function () {
 
     // render recipe
     recipeView.render(model.state.recipe);
+    console.log(model.state.recipe);
+
+    // add event listner to bookmark button
+    bookmarksView.addBookmarksHandler(controlBookmarks);
   } catch (err) {
     console.log(err);
     recipeView.renderError(err);
@@ -56,12 +61,21 @@ const controlPagination = function (pageToGo = 1) {
   paginationView.render(model.state.page);
 };
 
+const controlBookmarks = function () {
+  // save or remove
+  model.toggleBookmark(model.state.recipe);
+
+  // refresh bookmark list
+  bookmarksView.render(model.state.bookmarks);
+};
+
 ////////////////////////////////////////////////////////////
 // add event listeners
 const init = function () {
   recipeView.addRenderHandler(controlRecipe);
   searchView.addSearchHandler(controlSearch);
   paginationView.addPaginationHandler(controlPagination);
+  bookmarksView.render(model.state.bookmarks);
 };
 
 init();

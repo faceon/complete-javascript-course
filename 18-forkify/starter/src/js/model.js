@@ -14,6 +14,28 @@ export const state = {
     cur: 0,
     next: 0,
   },
+  bookmarks: [
+    {
+      title: 'Beef Fajitas',
+      id: '5ed6604591c37cdc054bcc30',
+      imgSrc: 'http://forkify-api.herokuapp.com/images/fajitas1ffd9.jpg',
+      publisher: 'The Pioneer Woman',
+    },
+    {
+      id: '5ed6604691c37cdc054bd039',
+      title: 'Perfect roast beef',
+      imgSrc:
+        'http://forkify-api.herokuapp.com/images/389_1_1350903718_lrg99fc.jpg',
+      publisher: 'Jamie Oliver',
+    },
+    {
+      id: '5ed6604591c37cdc054bcc97',
+      title: 'Beef Fajita Nachos',
+      imgSrc:
+        'http://forkify-api.herokuapp.com/images/5399163424_3893f0580c_o7c75.jpg',
+      publisher: 'The Pioneer Woman',
+    },
+  ],
 };
 
 export const loadRecipe = async function (id) {
@@ -21,6 +43,7 @@ export const loadRecipe = async function (id) {
     const data = await getJSON(API_URL + id);
     const { recipe } = data.data;
     state.recipe = {
+      id: recipe.id,
       cookingTime: recipe.cooking_time,
       imgSrc: recipe.image_url,
       sourceUrl: recipe.source_url,
@@ -69,4 +92,24 @@ export const getCurPage = function (curPage = 1) {
   const firstIndex = (state.page.cur - 1) * ENTRIES_PER_PAGE;
   const lastIndex = state.page.cur * ENTRIES_PER_PAGE;
   return state.search.results.slice(firstIndex, lastIndex);
+};
+
+export const toggleBookmark = function (recipe) {
+  // if id is in bookmarks, remove it
+  const recipeFound = state.bookmarks.find(
+    bookmark => bookmark.id === recipe.id
+  );
+  if (recipeFound) {
+    state.bookmarks.splice(state.bookmarks.indexOf({ id: recipeFound.id }), 1);
+    return;
+  }
+
+  // if not, add it to bookmarks
+  state.bookmarks.push({
+    id: recipe.id,
+    title: recipe.title,
+    imgSrc: recipe.imgSrc,
+    publisher: recipe.publisher,
+  });
+  console.log(state.bookmarks);
 };

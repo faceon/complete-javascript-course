@@ -9,6 +9,7 @@ export const state = {
     results: [],
   },
   page: {
+    // 1-based indexing for page number. 0 means 'do not render'
     prev: 0,
     cur: 0,
     next: 0,
@@ -46,24 +47,24 @@ export const loadSearch = async function (keyword) {
         id: recipe.id,
       };
     });
-    setCurPage(1);
+    setCurPage();
   } catch (err) {
     throw err;
   }
 };
 
-export const setCurPage = function (curPage) {
+export const setCurPage = function (curPage = 1) {
   curPage = Number.parseInt(curPage);
   const prevPage = curPage - 1;
   const nextPage = curPage + 1;
   const minPage = 1;
   const maxPage = Math.ceil(state.search.results.length / ENTRIES_PER_PAGE);
-  state.page.prev = prevPage >= minPage ? prevPage : null;
+  state.page.prev = prevPage >= minPage ? prevPage : 0;
   state.page.cur = curPage;
-  state.page.next = nextPage <= maxPage ? nextPage : null;
+  state.page.next = nextPage <= maxPage ? nextPage : 0;
 };
 
-export const loadCurPage = function (curPage) {
+export const getCurPage = function (curPage = 1) {
   setCurPage(curPage);
   const firstIndex = (state.page.cur - 1) * ENTRIES_PER_PAGE;
   const lastIndex = state.page.cur * ENTRIES_PER_PAGE;

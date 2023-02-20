@@ -35,11 +35,11 @@ const controlSearch = async function () {
     const query = searchView.getQuery();
     await model.loadSearch(query);
 
-    // load results
-    const results = model.loadCurPage(1);
-
-    // render search results
+    // load the first page of results
+    const results = model.getCurPage();
     resultsView.render(results);
+
+    // render pagination
     paginationView.render(model.state.page);
   } catch (err) {
     console.log(err);
@@ -47,13 +47,14 @@ const controlSearch = async function () {
   }
 };
 
-const controlPagination = function (pageToGo) {
-  const results = model.loadCurPage(pageToGo);
+const controlPagination = function (pageToGo = 1) {
+  // load the results for the page to go
+  const results = model.getCurPage(pageToGo);
   resultsView.render(results);
+
+  // render paginations
   paginationView.render(model.state.page);
 };
-
-// if (module.hot) module.hot.accept();
 
 ////////////////////////////////////////////////////////////
 // add event listeners

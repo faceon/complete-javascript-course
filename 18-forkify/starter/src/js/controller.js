@@ -10,7 +10,7 @@ import bookmarksView from './views/bookmarksView';
 const controlRecipe = async function () {
   try {
     // get recipe id from address
-    const id = window.location.hash.slice(1) ?? `5ed6604591c37cdc054bc886`;
+    const id = recipeView.getId();
     if (!id) return;
 
     // show spinner while fetching
@@ -21,6 +21,10 @@ const controlRecipe = async function () {
 
     // render recipe
     recipeView.render(model.state.recipe);
+
+    // update recipe search results to activate selected link
+    console.log(model.state);
+    resultsView.update(model.getCurPage());
 
     // add event listner to +, - servings
     recipeView.addServingsHandler(controlServings);

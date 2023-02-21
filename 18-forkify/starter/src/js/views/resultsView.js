@@ -4,9 +4,12 @@ class ResultsView extends View {
   parentElement = document.querySelector('.results');
 
   getMarkup(data) {
+    const id = this.getId();
     const previewMarkup = recipe => `
       <li class="preview">
-        <a class="preview__link preview__link--active" href="#${recipe.id}">
+        <a class="preview__link ${
+          recipe.id === id ? `preview__link--active` : ''
+        }" href="#${recipe.id}">
           <figure class="preview__fig">
             <img src="${recipe.imgSrc}" alt="Test" />
           </figure>

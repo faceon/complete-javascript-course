@@ -15,9 +15,6 @@ export default class View {
   }
 
   update(data) {
-    if (!data || (Array.isArray(data) && data.length === 0)) {
-      return this.renderError(new Error(this.errorMessage));
-    }
     const markup = this.getMarkup(data);
 
     // make a minimal document object of markup which has new info to render
@@ -29,15 +26,27 @@ export default class View {
     // flatten parentElements' sub nodes which have old info to update
     const curElements = Array.from(this.parentElement.querySelectorAll('*'));
 
-    // if newElement's textContent differs from curElement, update it
     newElements.forEach((newElement, i) => {
       const curElement = curElements.at(i);
+      // if newElement's textContent differs from curElement's, update the latter's
       if (
         !newElement.isEqualNode(curElement) && // if any changed
         newElement.firstChild?.nodeValue.trim() !== '' // if newElement has text data as firstChild
-      )
+      ) {
         curElement.textContent = newElement.textContent;
+      }
+
+      // if newElement's attribute differs from curElement's, update the latter's
+      if (!newElement.isEqualNode(curElement)) {
+        Array.from(newElement.attributes).forEach(newAttribute => {
+          curElement.setAttribute(newAttribute.name, newAttribute.value);
+        });
+      }
     });
+  }
+
+  getId() {
+    return window.location.hash.slice(1);
   }
 
   clear() {

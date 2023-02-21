@@ -21,7 +21,9 @@ const controlRecipe = async function () {
 
     // render recipe
     recipeView.render(model.state.recipe);
-    console.log(model.state.recipe);
+
+    // add event listner to +, - servings
+    recipeView.addServingsHandler(controlServings);
 
     // add event listner to bookmark button
     bookmarksView.addBookmarksHandler(controlBookmarks);
@@ -62,11 +64,19 @@ const controlPagination = function (pageToGo = 1) {
 };
 
 const controlBookmarks = function () {
-  // save or remove
+  // save or remove current recipe to bookmarks
   model.toggleBookmark(model.state.recipe);
 
   // refresh bookmark list
   bookmarksView.render(model.state.bookmarks);
+};
+
+const controlServings = function (servingsChange) {
+  // update current recipe's servings
+  model.updateServings(servingsChange);
+
+  // render recipe again
+  recipeView.render(model.state.recipe);
 };
 
 ////////////////////////////////////////////////////////////
@@ -75,7 +85,7 @@ const init = function () {
   recipeView.addRenderHandler(controlRecipe);
   searchView.addSearchHandler(controlSearch);
   paginationView.addPaginationHandler(controlPagination);
-  bookmarksView.render(model.state.bookmarks);
+  bookmarksView.render(model.loadBookmarks());
 };
 
 init();

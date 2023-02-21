@@ -48,6 +48,7 @@ export const loadRecipe = async function (id) {
       imgSrc: recipe.image_url,
       sourceUrl: recipe.source_url,
       servings: recipe.servings,
+      newServings: recipe.servings,
       title: recipe.title,
       publisher: recipe.publisher,
       ingredients: recipe.ingredients,
@@ -95,21 +96,52 @@ export const getCurPage = function (curPage = 1) {
 };
 
 export const toggleBookmark = function (recipe) {
-  // if id is in bookmarks, remove it
   const recipeFound = state.bookmarks.find(
     bookmark => bookmark.id === recipe.id
   );
+  // if id is in bookmarks, remove it
   if (recipeFound) {
     state.bookmarks.splice(state.bookmarks.indexOf({ id: recipeFound.id }), 1);
-    return;
+  } else {
+    // if not, add it to bookmarks
+    state.bookmarks.push({
+      id: recipe.id,
+      title: recipe.title,
+      imgSrc: recipe.imgSrc,
+      publisher: recipe.publisher,
+    });
   }
 
-  // if not, add it to bookmarks
-  state.bookmarks.push({
-    id: recipe.id,
-    title: recipe.title,
-    imgSrc: recipe.imgSrc,
-    publisher: recipe.publisher,
-  });
-  console.log(state.bookmarks);
+  // save current bookmarks to local storage
+  saveBookmarks();
+};
+
+export const clearBookmarks = function () {
+  localStorage.clear();
+};
+
+const saveBookmarks = function () {
+  localStorage.setItem('bookmarks', JSON.stringify(state.bookmarks));
+  console.log('saved', state.bookmarks);
+};
+
+export const loadBookmarks = function () {
+  const loadedBookmarks = localStorage.getItem('bookmarks');
+  console.log(loadedBookmarks);
+  return loadedBookmarks;
+  // state.bookmarks = loadedBookmarks ?? [];
+  // console.log('loaded', state.bookmarks);
+  // return state.bookmarks;
+};
+
+export const updateServings = function (servingsChange) {
+  if (state.recipe.newServings === 1 && servingsChange < 0)
+    return console.log('cannot be less than 1');
+  state.recipe.newServings += Number.parseInt(servingsChange);
+  console.log(
+    'now servings are',
+    state.recipe.newServings,
+    '/',
+    state.recipe.servings
+  );
 };

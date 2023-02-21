@@ -76,7 +76,7 @@ const controlServings = function (servingsChange) {
   model.updateServings(servingsChange);
 
   // render recipe again
-  recipeView.render(model.state.recipe);
+  recipeView.update(model.state.recipe);
 };
 
 ////////////////////////////////////////////////////////////

@@ -126,22 +126,14 @@ const saveBookmarks = function () {
 };
 
 export const loadBookmarks = function () {
-  const loadedBookmarks = localStorage.getItem('bookmarks');
-  console.log(loadedBookmarks);
-  return loadedBookmarks;
-  // state.bookmarks = loadedBookmarks ?? [];
-  // console.log('loaded', state.bookmarks);
-  // return state.bookmarks;
+  const loadedBookmarks = JSON.parse(localStorage.getItem('bookmarks'));
+  state.bookmarks = loadedBookmarks ?? [];
+  console.log('loaded', state.bookmarks);
+  return state.bookmarks;
 };
 
 export const updateServings = function (servingsChange) {
   if (state.recipe.newServings === 1 && servingsChange < 0)
     return console.log('cannot be less than 1');
   state.recipe.newServings += Number.parseInt(servingsChange);
-  console.log(
-    'now servings are',
-    state.recipe.newServings,
-    '/',
-    state.recipe.servings
-  );
 };

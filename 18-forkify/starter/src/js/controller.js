@@ -6,6 +6,7 @@ import searchView from './views/searchView';
 import resultsView from './views/resultsView';
 import paginationView from './views/paginationView';
 import bookmarksView from './views/bookmarksView';
+import addRecipeView from './views/addRecipeView';
 
 const controlRecipe = async function () {
   try {
@@ -82,17 +83,20 @@ const controlBookmarks = function () {
   bookmarksView.render(model.state.bookmarks);
 };
 
+const controlAddRecipe = function () {};
+
 ////////////////////////////////////////////////////////////
 // add event listeners
 const init = function () {
   // render the recipe on window load
   recipeView.addRenderHandler(controlRecipe);
 
-  // add event listeners to servings and bookmark buttons
+  // add listeners to servings and bookmark buttons
   recipeView.addServingsHandler(controlServings);
   recipeView.addBookmarkHandler(controlBookmarks);
 
   searchView.addSearchHandler(controlSearch);
+  addRecipeView.addRecipeAddHandler(controlAddRecipe);
   paginationView.addPaginationHandler(controlPagination);
 };
 

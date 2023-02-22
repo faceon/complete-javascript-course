@@ -83,21 +83,20 @@ const controlBookmarks = function () {
   bookmarksView.render(model.state.bookmarks);
 };
 
-const controlAddRecipe = function () {};
+const controlAddRecipe = function (data) {
+  console.log(data);
+};
 
 ////////////////////////////////////////////////////////////
 // add event listeners
 const init = function () {
-  // render the recipe on window load
   recipeView.addRenderHandler(controlRecipe);
-
-  // add listeners to servings and bookmark buttons
   recipeView.addServingsHandler(controlServings);
   recipeView.addBookmarkHandler(controlBookmarks);
 
   searchView.addSearchHandler(controlSearch);
-  addRecipeView.addRecipeAddHandler(controlAddRecipe);
   paginationView.addPaginationHandler(controlPagination);
+  addRecipeView.addRecipeFormHandler(controlAddRecipe);
 };
 
 init();

@@ -14,28 +14,7 @@ export const state = {
     cur: 0,
     next: 0,
   },
-  bookmarks: [
-    {
-      title: 'Beef Fajitas',
-      id: '5ed6604591c37cdc054bcc30',
-      imgSrc: 'http://forkify-api.herokuapp.com/images/fajitas1ffd9.jpg',
-      publisher: 'The Pioneer Woman',
-    },
-    {
-      id: '5ed6604691c37cdc054bd039',
-      title: 'Perfect roast beef',
-      imgSrc:
-        'http://forkify-api.herokuapp.com/images/389_1_1350903718_lrg99fc.jpg',
-      publisher: 'Jamie Oliver',
-    },
-    {
-      id: '5ed6604591c37cdc054bcc97',
-      title: 'Beef Fajita Nachos',
-      imgSrc:
-        'http://forkify-api.herokuapp.com/images/5399163424_3893f0580c_o7c75.jpg',
-      publisher: 'The Pioneer Woman',
-    },
-  ],
+  bookmarks: [],
 };
 
 export const loadRecipe = async function (id) {
@@ -53,6 +32,9 @@ export const loadRecipe = async function (id) {
       publisher: recipe.publisher,
       ingredients: recipe.ingredients,
     };
+    loadBookmarks();
+    if (isInBookmarks(recipe.id)) state.recipe.bookmarked = true;
+    console.log(state.recipe);
   } catch (err) {
     throw err;
   }
@@ -71,7 +53,7 @@ export const loadSearch = async function (keyword) {
         id: recipe.id,
       };
     });
-    setCurPage();
+    setCurPage(1);
   } catch (err) {
     throw err;
   }
@@ -95,13 +77,15 @@ export const getCurPage = function (curPage = 1) {
   return state.search.results.slice(firstIndex, lastIndex);
 };
 
+const isInBookmarks = function (id) {
+  return state.bookmarks.some(bookmark => bookmark.id === id);
+};
+
 export const toggleBookmark = function (recipe) {
-  const recipeFound = state.bookmarks.find(
-    bookmark => bookmark.id === recipe.id
-  );
   // if id is in bookmarks, remove it
-  if (recipeFound) {
-    state.bookmarks.splice(state.bookmarks.indexOf({ id: recipeFound.id }), 1);
+  if (isInBookmarks(recipe.id)) {
+    state.bookmarks.splice(state.bookmarks.indexOf({ id: recipe.id }), 1);
+    state.recipe.bookmarked = false;
   } else {
     // if not, add it to bookmarks
     state.bookmarks.push({
@@ -110,25 +94,26 @@ export const toggleBookmark = function (recipe) {
       imgSrc: recipe.imgSrc,
       publisher: recipe.publisher,
     });
+    state.recipe.bookmarked = true;
   }
 
   // save current bookmarks to local storage
-  saveBookmarks();
+  saveBookmarks(state.bookmarks);
 };
 
 export const clearBookmarks = function () {
   localStorage.clear();
 };
 
-const saveBookmarks = function () {
-  localStorage.setItem('bookmarks', JSON.stringify(state.bookmarks));
-  console.log('saved', state.bookmarks);
+const saveBookmarks = function (bookmarks) {
+  localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+  console.log('Bookmarks saved', bookmarks);
 };
 
 export const loadBookmarks = function () {
-  const loadedBookmarks = JSON.parse(localStorage.getItem('bookmarks'));
-  state.bookmarks = loadedBookmarks ?? [];
-  console.log('loaded', state.bookmarks);
+  const savedBookmarks = JSON.parse(localStorage.getItem('bookmarks')) ?? [];
+  state.bookmarks = savedBookmarks;
+  console.log('Bookmarks loaded', state.bookmarks);
   return state.bookmarks;
 };
 

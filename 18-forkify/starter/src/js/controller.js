@@ -22,15 +22,11 @@ const controlRecipe = async function () {
     // render recipe
     recipeView.render(model.state.recipe);
 
+    // render bookmarks
+    bookmarksView.render(model.state.bookmarks);
+
     // update recipe search results to activate selected link
-    console.log(model.state);
     resultsView.update(model.getCurPage());
-
-    // add event listner to +, - servings
-    recipeView.addServingsHandler(controlServings);
-
-    // add event listner to bookmark button
-    bookmarksView.addBookmarksHandler(controlBookmarks);
   } catch (err) {
     console.log(err);
     recipeView.renderError(err);
@@ -67,29 +63,37 @@ const controlPagination = function (pageToGo = 1) {
   paginationView.render(model.state.page);
 };
 
-const controlBookmarks = function () {
-  // save or remove current recipe to bookmarks
-  model.toggleBookmark(model.state.recipe);
-
-  // refresh bookmark list
-  bookmarksView.render(model.state.bookmarks);
-};
-
 const controlServings = function (servingsChange) {
   // update current recipe's servings
   model.updateServings(servingsChange);
 
-  // render recipe again
+  // update recipe to refresh quantities
   recipeView.update(model.state.recipe);
+};
+
+const controlBookmarks = function () {
+  // save or remove current recipe to bookmarks
+  model.toggleBookmark(model.state.recipe);
+
+  // update recipe
+  recipeView.update(model.state.recipe);
+
+  // update bookmark list
+  bookmarksView.render(model.state.bookmarks);
 };
 
 ////////////////////////////////////////////////////////////
 // add event listeners
 const init = function () {
+  // render the recipe on window load
   recipeView.addRenderHandler(controlRecipe);
+
+  // add event listeners to servings and bookmark buttons
+  recipeView.addServingsHandler(controlServings);
+  recipeView.addBookmarkHandler(controlBookmarks);
+
   searchView.addSearchHandler(controlSearch);
   paginationView.addPaginationHandler(controlPagination);
-  bookmarksView.render(model.loadBookmarks());
 };
 
 init();

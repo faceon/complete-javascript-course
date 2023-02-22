@@ -3,11 +3,6 @@ import View from './View';
 class BookmarksView extends View {
   parentElement = document.querySelector('.bookmarks');
 
-  addBookmarksHandler(handler) {
-    const bookmarkBtn = document.querySelector('.btn--round');
-    bookmarkBtn.addEventListener('click', handler);
-  }
-
   getMarkup(previews) {
     let markup = '';
     previews.forEach(

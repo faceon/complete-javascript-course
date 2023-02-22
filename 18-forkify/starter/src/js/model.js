@@ -32,7 +32,6 @@ export const loadRecipe = async function (id) {
       publisher: recipe.publisher,
       ingredients: recipe.ingredients,
     };
-    loadBookmarks();
     if (isInBookmarks(recipe.id)) state.recipe.bookmarked = true;
     console.log(state.recipe);
   } catch (err) {
@@ -59,7 +58,7 @@ export const loadSearch = async function (keyword) {
   }
 };
 
-export const setCurPage = function (curPage = 1) {
+const setCurPage = function (curPage = 1) {
   curPage = Number.parseInt(curPage);
   const prevPage = curPage - 1;
   const nextPage = curPage + 1;
@@ -101,7 +100,7 @@ export const toggleBookmark = function (recipe) {
   saveBookmarks(state.bookmarks);
 };
 
-export const clearBookmarks = function () {
+const clearBookmarks = function () {
   localStorage.clear();
 };
 
@@ -110,7 +109,7 @@ const saveBookmarks = function (bookmarks) {
   console.log('Bookmarks saved', bookmarks);
 };
 
-export const loadBookmarks = function () {
+const loadBookmarks = function () {
   const savedBookmarks = JSON.parse(localStorage.getItem('bookmarks')) ?? [];
   state.bookmarks = savedBookmarks;
   console.log('Bookmarks loaded', state.bookmarks);
@@ -122,3 +121,9 @@ export const updateServings = function (servingsChange) {
     return console.log('cannot be less than 1');
   state.recipe.newServings += Number.parseInt(servingsChange);
 };
+
+const init = function () {
+  loadBookmarks();
+};
+
+init();

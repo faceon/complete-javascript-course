@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////
-import { API_URL, SEARCH_URL, ENTRIES_PER_PAGE } from './config';
-import { getJSON } from './helpers';
+import { API_URL, API_KEY, SEARCH_URL, ENTRIES_PER_PAGE } from './config';
+import { getJSON, sendJSON } from './helpers';
 
 export const state = {
   recipe: {},
@@ -17,21 +17,25 @@ export const state = {
   bookmarks: [],
 };
 
+const convertRecipe = function (recipe) {
+  return {
+    id: recipe.id,
+    cookingTime: recipe.cooking_time,
+    imgSrc: recipe.image_url,
+    sourceUrl: recipe.source_url,
+    servings: recipe.servings,
+    newServings: recipe.servings,
+    title: recipe.title,
+    publisher: recipe.publisher,
+    ingredients: recipe.ingredients,
+  };
+};
+
 export const loadRecipe = async function (id) {
   try {
     const data = await getJSON(API_URL + id);
     const { recipe } = data.data;
-    state.recipe = {
-      id: recipe.id,
-      cookingTime: recipe.cooking_time,
-      imgSrc: recipe.image_url,
-      sourceUrl: recipe.source_url,
-      servings: recipe.servings,
-      newServings: recipe.servings,
-      title: recipe.title,
-      publisher: recipe.publisher,
-      ingredients: recipe.ingredients,
-    };
+    state.recipe = convertRecipe(recipe);
     if (isInBookmarks(recipe.id)) state.recipe.bookmarked = true;
     console.log(state.recipe);
   } catch (err) {
@@ -106,13 +110,13 @@ const clearBookmarks = function () {
 
 const saveBookmarks = function (bookmarks) {
   localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
-  console.log('Bookmarks saved', bookmarks);
+  // console.log('Bookmarks saved', bookmarks);
 };
 
 const loadBookmarks = function () {
   const savedBookmarks = JSON.parse(localStorage.getItem('bookmarks')) ?? [];
   state.bookmarks = savedBookmarks;
-  console.log('Bookmarks loaded', state.bookmarks);
+  // console.log('Bookmarks loaded', state.bookmarks);
   return state.bookmarks;
 };
 
@@ -120,6 +124,40 @@ export const updateServings = function (servingsChange) {
   if (state.recipe.newServings === 1 && servingsChange < 0)
     return console.log('cannot be less than 1');
   state.recipe.newServings += Number.parseInt(servingsChange);
+};
+
+export const addRecipe = async function (inputRecipe) {
+  try {
+    const ingredients = Object.entries(inputRecipe)
+      .filter(
+        entry => entry.at(0).startsWith('ingredient') && entry.at(1) !== ''
+      )
+      .map(entry => {
+        const details = entry.at(1).split(',');
+        if (details.length !== 3)
+          throw new Error('Please use the correct format with commas');
+        return {
+          quantity: details[0] ? +details[0] : null,
+          unit: details[1],
+          description: details[2],
+        };
+      });
+
+    const newRecipe = {
+      cooking_time: +inputRecipe.cookingTime,
+      image_url: inputRecipe.imgSrc,
+      publisher: inputRecipe.publisher,
+      servings: +inputRecipe.servings,
+      source_url: inputRecipe.sourceUrl,
+      title: inputRecipe.title,
+      ingredients,
+    };
+
+    const data = await sendJSON(`${API_URL}?key=${API_KEY}`, newRecipe);
+    state.recipe = convertRecipe(data.data.recipe);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const init = function () {

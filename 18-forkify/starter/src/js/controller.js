@@ -83,8 +83,18 @@ const controlBookmarks = function () {
   bookmarksView.render(model.state.bookmarks);
 };
 
-const controlAddRecipe = function (data) {
-  console.log(data);
+const controlAddRecipe = async function (recipe) {
+  // pass data to model which saves to local storage
+  try {
+    await model.addRecipe(recipe);
+    recipeView.render(model.state.recipe);
+    model.toggleBookmark(model.state.recipe);
+    bookmarksView.render(model.state.bookmarks);
+    addRecipeView.toggleHidden();
+  } catch (err) {
+    console.error('💥', err);
+    addRecipeView.renderError(err);
+  }
 };
 
 ////////////////////////////////////////////////////////////

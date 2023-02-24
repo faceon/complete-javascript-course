@@ -76,7 +76,7 @@ const controlBookmarks = function () {
   // save or remove current recipe to bookmarks
   model.toggleBookmark(model.state.recipe);
 
-  // update recipe
+  // update recip8e
   recipeView.update(model.state.recipe);
 
   // update bookmark list

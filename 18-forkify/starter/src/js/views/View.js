@@ -4,7 +4,13 @@ export default class View {
   parentElement;
   icons = icons;
   errorMessage = '0 result';
-
+  /**
+   * Render the received object to the DOM
+   * @param {Object | Object[]} data The data to be rendered (e.g. recipe)
+   * @this {Object} View instance
+   * @author Seongwkim
+   * @todo do your job
+   */
   render(data) {
     if (!data || (Array.isArray(data) && data.length === 0)) {
       return this.renderError(new Error(this.errorMessage));
